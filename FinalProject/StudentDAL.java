@@ -5,21 +5,21 @@ import java.util.ArrayList;
 
 public class StudentDAL {
     final String filePath = "Student.txt";
-    private void WriteData(String lineToAppend,boolean Append){
-        try{
+
+    private void WriteData(String lineToAppend, boolean Append) {
+        try {
             FileOutputStream f = new FileOutputStream(filePath, Append);
 
             byte[] byteArr = lineToAppend.getBytes();
             f.write(byteArr);
             f.close();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public ArrayList<String> Find(boolean AllButThisID, String ID){
-        ArrayList<String > str = new ArrayList<String>();
+    public ArrayList<String> Find(boolean AllButThisID, String ID) {
+        ArrayList<String> str = new ArrayList<String>();
         try {
             File file = new File(filePath);
             FileReader fr = new FileReader(file);
@@ -28,26 +28,29 @@ public class StudentDAL {
             String line;
 
             while ((line = br.readLine()) != null) {
-                if ((AllButThisID && !line.split(",")[0].toString().equals(ID.toString())) || (!AllButThisID && line.split(",")[0].toString().equals(ID.toString()) )) {
-                str.add(line);}
+                if ((AllButThisID && !line.split(",")[0].toString().equals(ID.toString())) || (!AllButThisID && line.split(",")[0].toString().equals(ID.toString()))) {
+                    str.add(line);
+                }
             }
             fr.close();         //Closes the stream and release the resources
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return str;
     }
+
     public ArrayList<String> Search(String ID, String Name, double MG) {
         ArrayList<String> str = new ArrayList<String>();
-        try{
+        try {
             File file = new File(filePath);    // Creates a new file instance
             FileReader fr = new FileReader(file);   //reads the file
             BufferedReader br = new BufferedReader(fr); //Creates a buffering character input stream
             StringBuffer sb = new StringBuffer();       //Constructs a String buffer with no characters
             String line;
 
-            str.add(br.readLine());
-            while((line = br.readLine())!=null){
+//            str.add(br.readLine());
+            while ((line = br.readLine()) != null) {
+                if (line.equals("") || line.equals("\n")) continue;
                 String stdID = line.split(",")[0].toString();
                 String stdName = line.split(",")[1].toString();
                 double stdMG = Double.parseDouble(line.split(",")[2].toString());
@@ -55,14 +58,40 @@ public class StudentDAL {
                 /**
                  * Implement
                  */
-                if ((stdID.equals(ID.toString())&& !ID.toString().equals("") || (stdName.contains(Name.toString()) && !Name.toString().equals("")) || (stdMG == MG && MG !=0) )){
-                    str.add(line);}}
-                fr.close();
-            }catch (IOException e){
-                e.printStackTrace();
+                if ((stdID.equals(ID.toString()) && !ID.toString().equals("") || (stdName.contains(Name.toString()) && !Name.toString().equals("")) || (stdMG == MG && MG != 0))) {
+                    str.add(line);
+                }
+            }
+            fr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return str;
 
+    }
+
+    public void Insert(String stdID, String stdName, double stdMG) {
+        String entry = "\n" + stdID + "," + stdName + "," + stdMG;
+        WriteData(entry, true);
+    }
+
+    public void Update(String stdID, String stdName, double stdMG) {
+        ArrayList<String> allData = Find(true, stdID);
+        String str = "";
+        for (String item : allData) {
+            str += item + "\n";
+        }
+        str += stdID + "," + stdName + "," + stdMG;
+        WriteData(str, false);
+    }
+
+    public void Delete(String stdID) {
+        ArrayList<String> allData = Find(true, stdID);
+        String str = "";
+        for (String item : allData) {
+            str += item + "\n";
+        }
+        WriteData(str, false);
     }
 
 }
